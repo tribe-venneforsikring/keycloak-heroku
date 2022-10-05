@@ -25,7 +25,7 @@ public class ApiKeyResource {
     @GET
     @Produces("application/json")
     public Response checkApiKey(@HeaderParam("x-api-key") String apiKey) {
-        Stream<UserModel> result = session.userStorageManager().searchForUserByUserAttributeStream(session.realms().getRealm(realmName), "api-key", "api-key"); 
+        Stream<UserModel> result = this.session.userStorageManager().searchForUserByUserAttributeStream(this.session.realms().getRealm(realmName), "api-key", "api-key");
         return result.count() == 0 ? Response.status(401).type(MediaType.APPLICATION_JSON).build(): Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 }
