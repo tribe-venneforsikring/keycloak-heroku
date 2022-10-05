@@ -1,10 +1,10 @@
 package com.gwidgets.resources;
 
-import java.util.List;
+import java.util.stream.Stream;
 import java.util.Objects;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.keycloak.models.KeycloakSession;
@@ -24,8 +24,8 @@ public class ApiKeyResource {
 
     @GET
     @Produces("application/json")
-    public Response checkApiKey(@QueryParam("apiKey") String apiKey) {
-        List<UserModel> result = session.userStorageManager().searchForUserByUserAttribute("api-key", apiKey, session.realms().getRealm(realmName));
-        return result.isEmpty() ? Response.status(401).type(MediaType.APPLICATION_JSON).build(): Response.ok().type(MediaType.APPLICATION_JSON).build();
+    public Response checkApiKey(@HeaderParam("x-api-key") String apiKey) {
+        Stream<UserModel> result = session.userStorageManager().searchForUserByUserAttributeStream(session.realms().getRealm(realmName), "api-key", "api-key"); 
+        return result.count() == 0 ? Response.status(401).type(MediaType.APPLICATION_JSON).build(): Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 }
