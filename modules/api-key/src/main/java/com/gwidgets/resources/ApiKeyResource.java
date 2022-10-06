@@ -2,6 +2,7 @@ package com.gwidgets.resources;
 
 import java.util.stream.Stream;
 import java.util.Objects;
+import static java.lang.System.out;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.HeaderParam;
@@ -14,18 +15,14 @@ public class ApiKeyResource {
 
     private KeycloakSession session;
 
-    private final String realmName;
-
     public ApiKeyResource(KeycloakSession session) {
         this.session = session;
-        String envRealmName = System.getenv("REALM_NAME");
-        this.realmName = Objects.isNull(envRealmName) || Objects.equals(System.getenv(envRealmName), "")? "example": envRealmName;
     }
 
     @GET
     @Produces("application/json")
     public Response checkApiKey(@HeaderParam("x-api-key") String apiKey) {
-        Stream<UserModel> result = this.session.userStorageManager().searchForUserByUserAttributeStream(this.session.realms().getRealm(realmName), "api-key", "api-key");
+        Stream<UserModel> result = this.session.userStorageManager().searchForUserByUserAttributeStream(session.getContext().getRealm(), "api-key", apiKey);
         return result.count() == 0 ? Response.status(401).type(MediaType.APPLICATION_JSON).build(): Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 }
